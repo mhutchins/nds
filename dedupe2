@@ -1,0 +1,9 @@
+#!/usr/bin/ksh
+
+echo "select count(*), dupeid from dupe group by 2 having count(*) > 1" | mysql -qN -u nds nds | while read count dupeid
+do
+	echo "select * from dupe where dupeid = $dupeid " | mysql -qN -u nds nds 
+	echo "select * from adv where duplicateid = $dupeid " | mysql -qN -u nds nds
+	echo ""
+done
+

@@ -1,0 +1,12 @@
+#!/usr/bin/ksh
+
+echo "select location, romid, duplicateid from adv where location = 'Eur' and duplicateid != 0 and romid not in (select master from dupe)" | mysql -qN -u nds nds | while read location romid dupeid
+do
+	echo "Got $romid $dupeid $location";
+
+	echo "select romid from adv where duplicateid = $dupeid and location = 'Eur'" | mysql -qN -u nds nds | read master
+
+	echo "insert into dupe values ($dupeid, $master);" | mysql -qN -u nds nds
+	
+done
+
