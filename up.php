@@ -38,10 +38,31 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 
         $db = new PDO('mysql:host=192.168.2.100;dbname=nds', 'nds');
 
-        $xml = simplexml_load_file("/tmp/ADVANsCEne_NDScrc.xml");
+        //$xml = simplexml_load_file("/tmp/ADVANsCEne_NDScrc.xml");
+        $xml = simplexml_load_file("/tmp/ADVANsCEne_NDS.xml");
 
 	echo "Version: " . $xml->configuration->datVersion;
+/*
+  ["imageNumber"]=> string(4) "3010"
+  ["releaseNumber"]=> string(4) "3010"
+  ["title"]=> string(23) "007 - Quantum of Solace"
+  ["saveType"]=> string(15) "Eeprom - 4 kbit"
+  ["romSize"]=> string(8) "33554432"
+  ["publisher"]=> string(10) "Activision"
+  ["location"]=> string(1) "1"
+  ["sourceRom"]=> string(10) "XenoPhobia"
+  ["language"]=> string(1) "3"
+  ["files"]=> object(SimpleXMLElement)#9 (1) {
+    ["romCRC"]=>
+    string(8) "2F1ACA8C"
+  }
+  ["im1CRC"]=> string(8) "954AA489"
+  ["im2CRC"]=> string(8) "EF3E4699"
+  ["comment"]=> string(4) "2934"
+  ["duplicateID"]=> string(3) "707"
 
+*/
+	
         foreach($xml->games->game as $game)
         {
                 $title = urlencode($game->title);
@@ -53,10 +74,16 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
                 $location = location2txt($game->location);
                 $version = $game->version;
                 $wifi = $game->wifi;
-                $duplicateid = $game->duplicateid;
+                $duplicateid = $game->duplicateID;
+
                 $romcrc = $game->files->romCRC;
                 $genre = $game->genre;
                 $romid = $game->comment;
+		if ($romid == "3783" )
+		{
+			var_dump($game);
+			lang($language);
+		}
 		echo "Romid: $romid...";
 
 		if (($language & bindec('00000000000000000010')) == 0)
@@ -79,9 +106,12 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 
 		if ($duplicateid > 0)
 		{
+			$query = "insert into dupelist values (:dupeid, :romid)";
+			echo "$query\n";
+			$sth = $db->prepare($query);
+			$sth->execute(array(':dupeid' => $duplicateid, ':romid' => $romid));
 			// Check if we have a 'bad' master already
 
-/*
 			$query = "select  cr.romid from card_rom cr, blobdata b  where cr.romid = $romid and  cr.romid=b.id and b.type='rom' and cr.romid not in (select romid from adv);";
 			$row = $db->query($query)->fetch();
 			if ($row['romid'] != "")	// This rom *should* be the master
@@ -90,21 +120,25 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 				$sth = $db->prepare($query);
 				$sth->execute(array(':dupeid' => $duplicateid));
 				$query = "insert into dupe values (:dupeid, :romid)";
+				echo "$query\n";
 				$sth = $db->prepare($query);
 				$sth->execute(array(':dupeid' => $duplicateid, ':romid' => $romid));
 			}
-*/
 		
 
-/*
 			$query="select dupeid from dupe where master=$romid";
 			$row = $db->query($query)->fetch();
 			if ( $row['dupeid'] == "" )	// Has duplicates, and this version is not listed as master
 			{
+				$query="select dupeid from dupe where dupeid=$duplicateid";
+				$row = $db->query($query)->fetch();
+				if ( $row['dupeid'] == "" )	// Has duplicates, and this version is not listed as master
+				{
+					echo "No Master selected for dupeid $duplicateid\n";
+				}
 				echo "Skipping: potential duplicate ($duplicateid)\n";
 				continue;
 			}
-	*/
 		}
 		echo "Updating...\n";
 

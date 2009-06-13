@@ -4,18 +4,56 @@
 	ini_set("memory_limit", -1  );
 	$target_path = "/opt/uploads/";
 
+	$IMGURL="http://www.retrocovers.com/offline/imgs/ADVANsCEne_NDS/";
+
         $db = new PDO('mysql:host=ndsdb;dbname=nds', 'nds');
 
 	$count=0;
 
-	$last_processed=0;
-	$last_processed=3000;
+	$last_processed=2742;
+//	$last_processed=3796;
 
-	$query="select romid, romcrc from adv where romid >= $last_processed order by romid";
+	$query="select romid, romcrc, imagenumber from adv where romid >= $last_processed order by romid";
 	foreach($db->query($query) as $row)
 	{
 		$romid = $row['romid'];
 		echo "Checking $romid\n";
+		$imagenumber=$row['imagenumber'];
+
+	$range = getrange($imagenumber);
+
+	$name=array();
+	exec("/usr/bin/ls /common/nds/$romid-ingame.png 2> /dev/null", $name);
+	$file = $name[0];
+	if ($file == "")
+	{
+		echo "Ingame PNG not found!\n";
+		$tmp = (int)$imagenumber;
+		$TGT=$IMGURL . $range . "/" . $tmp . "b.png";
+		echo "Storing $TGT to /common/nds/$romid-ingame.png\n";
+		file_put_contents("/common/nds/$romid-ingame.png", file_get_contents($TGT));
+	}
+
+	$name=array();
+	exec("/usr/bin/ls /common/nds/$romid-cover.png 2> /dev/null", $name);
+	$file = $name[0];
+	if ($file == "")
+	{
+		echo "Cover PNG not found!\n";
+		$tmp = (int)$imagenumber;
+		$TGT=$IMGURL . $range . "/" . $tmp . "a.png";
+		echo "Storing $TGT to /common/nds/$romid-cover.png\n";
+		$data=file_get_contents($TGT);
+		file_put_contents("/tmp/crop.png", $data);
+                exec("/usr/bin/rm -rf /tmp/crop-0.png");
+                exec("/usr/bin/rm -rf /tmp/crop-1.png");
+                echo "Cropping png...\n";
+                exec ("convert -crop 214x192 /tmp/crop.png /tmp/crop.png");
+                echo "Inserting pieces\n";
+                exec("mv /tmp/crop-0.png /common/nds/$romid-cover.png");
+                exec("mv /tmp/crop-1.png /common/nds/$romid-unknown.png");
+	}
+
 		$romcrc = ltrim($row['romcrc'], '0');
 		$query="select sum from blobdata where id=$romid and type='rom'";
 		//$query="select id from blobdata where id=$romid and type='unknown'";
@@ -29,6 +67,7 @@
 			$count++;
 		}
 	}
+
 function locate_update($romid)
 {
 	global $target_path;
@@ -38,7 +77,10 @@ function locate_update($romid)
 	exec("/usr/bin/mkdir -p $target_path 2> /dev/null");
 	exec("/usr/bin/chmod -R a+rw $target_path 2> /dev/null");
 
+
 	echo "Need to update: ($romid)\n";
+
+	$name=array();
 	exec("/usr/bin/ls /nds/*/$romid* 2> /dev/null", $name);
 	$file = $name[0];
 	if ($file == "")
@@ -127,5 +169,8 @@ function locate_update($romid)
 		}
 
 	}
+}
+function getfile($url)
+{
 }
 ?>

@@ -1116,4 +1116,45 @@ function update_roms($arg)
 		closedir($dh);
 	}
 }
+function getrange($romid)
+{
+	if ($romid > 0 && $romid <= 500)
+		return "1-500";
+	if ($romid > 500 && $romid <= 1000)
+		return "501-1000";
+	if ($romid > 1000 && $romid <= 1500)
+		return "1001-1500";
+	if ($romid > 1500 && $romid <= 2000)
+		return "1501-2000";
+	if ($romid > 2000 && $romid <= 2500)
+		return "2001-2500";
+	if ($romid > 2500 && $romid <= 3000)
+		return "2501-3000";
+	if ($romid > 3000 && $romid <= 3500)
+		return "3001-3500";
+	if ($romid > 3500 && $romid <= 4000)
+		return "3501-4000";
+	if ($romid > 4000 && $romid <= 4500)
+		return "4001-4500";
+	if ($romid > 4500 && $romid <= 5000)
+		return "4501-5000";
+	if ($romid > 5000 && $romid <= 5500)
+		return "5001-5500";
+	if ($romid > 5500 && $romid <= 6000)
+		return "5501-6000";
+	if ($romid > 6000 && $romid <= 6500)
+		return "6001-6500";
+	if ($romid > 6500 && $romid <= 7000)
+		return "6501-7000";
+	if ($romid > 7000 && $romid <= 7500)
+		return "7001-7500";
+	if ($romid > 7500 && $romid <= 8000)
+		return "7501-8000";
+	if ($romid > 8000 && $romid <= 8500)
+		return "8001-8500";
+	if ($romid > 8500 && $romid <= 9000)
+		return "8501-9000";
+	if ($romid > 9000 && $romid <= 9500)
+		return "9001-9500";
+}
 ?>
