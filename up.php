@@ -1,6 +1,7 @@
 #!/usr/local/bin/php -q
 <?php
-	$DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDScrc.zip";
+$DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDScrc.zip";
+$DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 	$TMPFILE=tempnam("/tmp", "advanscene");
 
 	$get_xml = 1;
@@ -20,9 +21,11 @@
 			die ("Could not open archive");
 		}
 
-		if (($index = $zip->locateName('ADVANsCEne_NDScrc.xml', ZIPARCHIVE::FL_NODIR)) !== false)
+		//if (($index = $zip->locateName('ADVANsCEne_NDScrc.xml', ZIPARCHIVE::FL_NODIR)) !== false)
+		if (($index = $zip->locateName('ADVANsCEne_NDS.xml', ZIPARCHIVE::FL_NODIR)) !== false)
 		{
-			$zip->extractTo('/tmp', 'ADVANsCEne_NDScrc.xml');
+			//$zip->extractTo('/tmp', 'ADVANsCEne_NDScrc.xml');
+			$zip->extractTo('/tmp', 'ADVANsCEne_NDS.xml');
 			echo "New XML extracted\n";
 		}
 		else

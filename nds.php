@@ -1,7 +1,4 @@
 <?php
-	require "ndsinc.php";
-
-
 	$dir = "c:\users\martin\\nds";
 
 	$html_header = "<!DOCTYPE HTML PUBLIC '-//W3C//DTD HTML 4.0//EN' 'http://www.w3.org/TR/REC-html40/strict.dtd'>";
@@ -16,7 +13,7 @@
 	$html_header .= "</head>\n";
 	$html_header .= "<BODY >\n";
 
-
+	require "ndsinc.php";
 
  
    $PHP_SELF=$_SERVER['PHP_SELF'];

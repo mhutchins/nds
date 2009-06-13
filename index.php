@@ -32,15 +32,6 @@
 
         $db = new PDO('mysql:host=ndsdb;dbname=nds', 'nds');
 
-/*
-	$query="select name from user";
-	echo "<pre>";
-	foreach($db->query($query) as $row)
-		echo "Name: " . $row['name'] . "\n";
-	echo "</pre>";
-	exit;
-*/
-
 	if (!isset($_COOKIE['sessionid']))
 	{
 		do_login();
