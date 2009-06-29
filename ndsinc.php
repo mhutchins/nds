@@ -3,8 +3,8 @@ function do_login()
 {
 	global $db;
 
-	$name = $_REQUEST['name'];
-	$pass = $_REQUEST['pass'];
+	$name = @$_REQUEST['name'];
+	$pass = @$_REQUEST['pass'];
 	if ($name != "" || $pass != "")
 	{
 		$query = "select id, MD5(UNIX_TIMESTAMP() + RAND(UNIX_TIMESTAMP())) gses from user where name = :name and password = :pass";
@@ -15,7 +15,13 @@ function do_login()
 		$res = $sth->fetchAll();
 		$row = $res[0];
 
-		if($rowcount == 1)
+/*
+		echo "<pre>";
+		var_dump($row);
+		echo "Rowcount: " . $rowcount . "\n";
+*/
+
+		if($row['gses'] != "")
 		{
 			$sessid = $row['gses'];
 			$query = "update user set sess_id = :sessid where name = :name ;";
@@ -29,21 +35,20 @@ function do_login()
 	}
 	$self=$_SERVER['REQUEST_URI'];
 	echo "<html><head><title>Login</title></head><body>	
-<form action='$self' name=myform id=myform method='Post'>
-Username:<br />
-<input type='Text' name='name' />
-<br />
-Password:<br />
-<input type='password' name='pass' />
-<br />
-<input type='submit' value='Login' />
-<input type='hidden' name='psRefer' value='$refer'>
-</form>
-<script type='text/javascript'>
- document.myform.name.focus();
-</script>
-</body>
-</html>";
+		<form action='$self' name=myform id=myform method='Post'>
+		Username:<br />
+		<input type='Text' name='name' />
+		<br />
+		Password:<br />
+		<input type='password' name='pass' />
+		<br />
+		<input type='submit' value='Login' />
+		</form>
+		<script type='text/javascript'>
+		 document.myform.name.focus();
+		</script>
+		</body>
+		</html>";
 
 }
 function edit_card()
@@ -115,9 +120,16 @@ function edit_card()
 	//echo "$query";
 	$sth = $db->prepare($query);
 	$sth->execute(array(':cardid' => $cardid));
-	$rowcount = $sth->rowCount();
+	//$rowcount = $sth->rowCount();
 	$res = $sth->fetchAll();
+/*
+	echo "<pre>";
+	var_dump($res);
+	echo "</pre>";
+*/
+	$rowcount = count($res);
 
+	$used=0;
 	foreach($res as $ucard_row)
 	{
 		$romid = $ucard_row['romid'];
@@ -130,9 +142,13 @@ function edit_card()
                 $sth = $db->prepare($query);
                 $sth->execute(array(':userid' => $userid, ':romid' => $romid));
                 $res = $sth->fetchAll();
-                $row = $res[0];
-
-		$saveid = $row['blobid'];
+		if ($res != false)
+		{
+			$row = $res[0];
+			$saveid = $row['blobid'];
+		}
+		else
+			$saveid=null;
 
 		if ($count % 2 == 0)
 		echo "<tr>\n";
@@ -323,15 +339,25 @@ function show_cards()
 				user u,
 				card c
 			where
-				u.id = c.userid";
+				u.id = c.userid
+			and
+				(
+					c.userid = :userid
+			";
 	if ($userid == 1)
-		$query .= "";
+		$query .= " or 1 = 1)";
 	else
-		$query .= " and c.userid = :userid";
+		$query .= " )";
 
 	$sth = $db->prepare($query);
 	$sth->execute(array(':userid' => $userid));
 	$res = $sth->fetchAll();
+
+/*
+	echo "<pre>";
+	var_dump($res);
+	echo "</pre>";
+*/
 
 	$oldname = "";
 
@@ -653,9 +679,18 @@ function show_roms()
 		$size=round($row['romsize'] / 1024 / 1024);
 		$genre=$row['genre'];
 
-		$query = "select blobid from save where userid='$userid' and romid='$romid'";
-		$res = $db->query($query)->fetch();
-		$saveid = $res['blobid'];
+		$query = "select blobid from save where userid=:userid and romid=:romid";
+                $sth = $db->prepare($query);
+                $sth->execute(array(':userid' => $userid, ':romid' => $romid));
+                $res = $sth->fetchAll();
+		if ($res != false)
+		{
+			$row = $res[0];
+			$saveid = $row['blobid'];
+		}
+		else
+			$saveid=null;
+
 		$a_rating = getvote($romid);
 		if($a_rating['avg'] <= 0 ) $a_rating['avg'] = 0;
 
@@ -713,8 +748,12 @@ function show_roms()
 	$self = $_SERVER['REQUEST_URI'];
 	$flt="";
 	if ($debug == "y") var_dump($filter);
-	foreach($filter as $filt)
-		$flt .= "filter[]=$filt&amp;";
+
+	if ($filter != NULL)
+	{
+		foreach($filter as $filt)
+			$flt .= "filter[]=$filt&amp;";
+	}
 		
 	$self = $_SERVER['PHP_SELF'] . "?action=add&amp;userid=$userid&amp;${flt}show_hidden=$show_hidden&amp;cardid=$cardid&amp;sort=$sort&amp;show=$show&amp;subaction=rom&amp;search=$search&amp;osearch=$osearch";
 	
@@ -874,13 +913,27 @@ function getvote($romid)
 	global $db;
 	global $userid;
 	
-	$query = "select avg(rating) avg from rating where romid = '$romid'";
-	$res = $db->query($query)->fetch();
-	$avg = $res['avg'];
+	$query = "select avg(rating), 1 avg from rating where romid = '$romid'";
+	$res = $db->query($query);
+
+	if ($res != false)
+	{
+		$row = $res->fetch();
+		$avg = $row['avg'];
+	}
+	else
+		$avg = 0;
 	
 	$query = "select rating myrating from rating where romid = '$romid' and userid='$userid'";
-	$res = $db->query($query)->fetch();
-	$myrating = $res['myrating'];
+	$res = $db->query($query);
+
+	if ($res != false)
+	{
+		$row = $res->fetch();
+		$myrating = $row['myrating'];
+	}
+	else
+		$myrating = 0;
 	
 	$result=array("avg" => $avg, "myrating" => $myrating);
 	return $result;
