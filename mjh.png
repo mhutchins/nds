@@ -1,8 +1,0 @@
---15:59:07--  http://localhost/nds/index.php?action=getimg&blobid=267
-           => `index.php?action=getimg&blobid=267'
-Connecting to localhost:80... connected!
-HTTP request sent, awaiting response... 200 OK
-Length: ignored [text/html]
-index.php?action=getimg&blobid=267: Invalid argument
-
-Cannot write to `index.php?action=getimg&blobid=267' (Invalid argument).

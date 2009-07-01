@@ -164,9 +164,9 @@ function edit_card()
 /*
 		echo "<td align=center>\n";
 		if ($saveid > 0)
-			echo "<a href=?action=savegame&amp;saveid=$saveid><img src=diskimg.png width=20 height=20 border=0 alt='SAVE file exists' ></a>\n";
+			echo "<a href=?action=savegame&amp;saveid=$saveid><img src=local_images/diskimg.png width=20 height=20 border=0 alt='SAVE file exists' ></a>\n";
 		else
-			echo "<a href=?action=savegame&amp;saveid=$saveid><img src=nodiskimg.png width=20 height=20 border=0 alt='No SAVE file on record'></a>\n";
+			echo "<a href=?action=savegame&amp;saveid=$saveid><img src=local_images/nodiskimg.png width=20 height=20 border=0 alt='No SAVE file on record'></a>\n";
 		echo "</td>";
 */
 		
@@ -709,7 +709,7 @@ function show_roms()
 				<div class='rom'   >$genre</div>
 				<div class='rom'   >${size}Mb";
 		if ($wifi == 1)
-				echo "<img src='images/wifi.png' alt='Wifi Game' onmouseover=\"showAltAlt(this, 'Wifi', 100);\" >";
+				echo "<img src='local_images/wifi.png' alt='Wifi Game' onmouseover=\"showAltAlt(this, 'Wifi', 100);\" >";
 		if ($userid == 1)
 			echo " $country_name";
  		echo "</div>";

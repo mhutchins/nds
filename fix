@@ -1,8 +1,0 @@
-
-#for file in 3308-cover.jpg
-for file in *-cover*
-do
-	romid=`echo $file | sed -e 's/-.*//'`
-	convert $file /common/nds/${romid}-cover.png
-
-done
