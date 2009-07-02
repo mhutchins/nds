@@ -18,19 +18,19 @@ function init_rating()
             var star = document.createElement('img');
             if (rating >= 1)
             {
-                star.setAttribute('src', './images/stars/rating_on.gif');
+                star.setAttribute('src', './local_images/stars/rating_on.gif');
                 star.className = 'on';
                 rating--;
             }
             else if(rating == 0.5)
             {
-                star.setAttribute('src', './images/stars/rating_half.gif');
+                star.setAttribute('src', './local_images/stars/rating_half.gif');
                 star.className = 'half';
                 rating = 0;
             }
             else
             {
-				star.setAttribute('src', './images/stars/rating_off.gif');
+				star.setAttribute('src', './local_images/stars/rating_off.gif');
 				star.className = 'off';
             }
             var widgetId = ratings[i].getAttribute('id').substr(7);
@@ -46,7 +46,7 @@ function displayHover(ratingId, star)
 {
     for (var i = 0; i <= star; i++)
     {
-        document.getElementById('star_'+ratingId+'_'+i).setAttribute('src', './images/stars/rating_over.gif');
+        document.getElementById('star_'+ratingId+'_'+i).setAttribute('src', './local_images/stars/rating_over.gif');
     }
 }
 
@@ -55,7 +55,7 @@ function displayNormal(ratingId, star)
     for (var i = 0; i <= star; i++)
     {
         var status = document.getElementById('star_'+ratingId+'_'+i).className;
-        document.getElementById('star_'+ratingId+'_'+i).setAttribute('src', './images/stars/rating_'+status+'.gif');
+        document.getElementById('star_'+ratingId+'_'+i).setAttribute('src', './local_images/stars/rating_'+status+'.gif');
     }
 }
 
