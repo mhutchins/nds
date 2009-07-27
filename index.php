@@ -27,7 +27,7 @@
 	//ob_start();
 	//echo $html_header;
 
-        $db = new PDO('mysql:host=192.168.2.100;dbname=nds', 'nds');
+        $db = new PDO('mysql:host=ndsdb;dbname=nds', 'nds');
 
 /*
 	$query="select name from user";

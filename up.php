@@ -36,7 +36,7 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 
 	}
 
-        $db = new PDO('mysql:host=192.168.2.100;dbname=nds', 'nds');
+        $db = new PDO('mysql:host=ndsdb;dbname=nds', 'nds');
 
         //$xml = simplexml_load_file("/tmp/ADVANsCEne_NDScrc.xml");
         $xml = simplexml_load_file("/tmp/ADVANsCEne_NDS.xml");
@@ -104,6 +104,7 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
                 else
                         $wifi=0;
 
+/*
 		if ($duplicateid > 0)
 		{
 			$query = "insert into dupelist values (:dupeid, :romid)";
@@ -112,7 +113,20 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 			$sth->execute(array(':dupeid' => $duplicateid, ':romid' => $romid));
 			// Check if we have a 'bad' master already
 
-			$query = "select  cr.romid from card_rom cr, blobdata b  where cr.romid = $romid and  cr.romid=b.id and b.type='rom' and cr.romid not in (select romid from adv);";
+			$query = "
+				select
+					cr.romid
+				from
+					card_rom cr, blobdata b
+				where
+					cr.romid = $romid
+				and
+					cr.romid=b.id
+				and
+					b.type='rom'
+				and
+					cr.romid not in (select romid from adv);";
+
 			$row = $db->query($query)->fetch();
 			if ($row['romid'] != "")	// This rom *should* be the master
 			{
@@ -140,6 +154,7 @@ $DAT_FILE="http://www.advanscene.com/offline/datas/ADVANsCEne_NDS.zip";
 				continue;
 			}
 		}
+*/
 		echo "Updating...\n";
 
                 $query = "replace into adv set
